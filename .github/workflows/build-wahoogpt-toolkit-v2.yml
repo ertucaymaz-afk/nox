@@ -23,16 +23,20 @@ jobs:
           node-version: '22'
 
       - name: Syntax check generators
+        shell: bash
         run: |
+          set -o pipefail
           node --check scripts/package-spec.js 2>&1 | tee syntax-package-spec.log
           node --check scripts/runtime-templates.js 2>&1 | tee syntax-runtime.log
-          node --check scripts/plugin-algorithms-template.js 2>&1 | tee syntax-algorithms.log
+          node --check scripts/plugin-algorithms-template-v3.js 2>&1 | tee syntax-algorithms.log
+          node --check scripts/plugin-algorithms-template.js 2>&1 | tee syntax-algorithm-loader.log
           node --check scripts/generate-package.js 2>&1 | tee syntax-generator.log
+          node --check scripts/generate-package-runner.js 2>&1 | tee syntax-generator-runner.log
 
       - name: Generate source package
         run: |
           set +e
-          node scripts/generate-package.js > generation.log 2>&1
+          node scripts/generate-package-runner.js > generation.log 2>&1
           code=$?
           echo "$code" > generation.exit.txt
           exit "$code"
@@ -99,7 +103,7 @@ jobs:
           name: WahooGPT_Toolkit_V2_Diagnostics
           path: diagnostics
 
-      - name: Print generator diagnostic only
+      - name: Print compact diagnostics
         run: |
           echo '=== GENERATION EXIT ==='
           cat diagnostics/generation.exit.txt 2>/dev/null || true
@@ -108,4 +112,4 @@ jobs:
           echo '=== TEST EXIT ==='
           cat diagnostics/tests.exit.txt 2>/dev/null || true
           echo '=== TEST LOG ==='
-          tail -n 120 diagnostics/tests.log 2>/dev/null || true
+          tail -n 160 diagnostics/tests.log 2>/dev/null || true
