@@ -34,7 +34,6 @@ jobs:
           set +e
           node scripts/generate-package.js > generation.log 2>&1
           code=$?
-          cat generation.log
           echo "$code" > generation.exit.txt
           exit "$code"
 
@@ -56,7 +55,6 @@ jobs:
           set +e
           node scripts/run-tests.js > ../../tests.log 2>&1
           code=$?
-          cat ../../tests.log
           echo "$code" > ../../tests.exit.txt
           exit "$code"
 
@@ -89,3 +87,25 @@ jobs:
             dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2/VALIDATION_REPORT.json
           if-no-files-found: error
           retention-days: 30
+
+  diagnostic-report:
+    if: always()
+    needs: build-package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download diagnostics
+        uses: actions/download-artifact@v4
+        with:
+          name: WahooGPT_Toolkit_V2_Diagnostics
+          path: diagnostics
+
+      - name: Print generator diagnostic only
+        run: |
+          echo '=== GENERATION EXIT ==='
+          cat diagnostics/generation.exit.txt 2>/dev/null || true
+          echo '=== GENERATION LOG ==='
+          tail -n 120 diagnostics/generation.log 2>/dev/null || true
+          echo '=== TEST EXIT ==='
+          cat diagnostics/tests.exit.txt 2>/dev/null || true
+          echo '=== TEST LOG ==='
+          tail -n 120 diagnostics/tests.log 2>/dev/null || true
