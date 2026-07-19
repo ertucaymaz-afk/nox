@@ -22,13 +22,12 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Syntax check generators
+      - name: Syntax check executable generators
         shell: bash
         run: |
           set -o pipefail
           node --check scripts/package-spec.js 2>&1 | tee syntax-package-spec.log
           node --check scripts/runtime-templates.js 2>&1 | tee syntax-runtime.log
-          node --check scripts/plugin-algorithms-template-v3.js 2>&1 | tee syntax-algorithms.log
           node --check scripts/plugin-algorithms-template.js 2>&1 | tee syntax-algorithm-loader.log
           node --check scripts/generate-package.js 2>&1 | tee syntax-generator.log
           node --check scripts/generate-package-runner.js 2>&1 | tee syntax-generator-runner.log
