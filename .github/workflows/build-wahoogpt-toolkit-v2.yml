@@ -42,7 +42,12 @@ jobs:
 
       - name: Run package doctor
         working-directory: dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2
-        run: node scripts/doctor.js
+        run: |
+          set +e
+          node scripts/doctor.js > ../../doctor.log 2>&1
+          code=$?
+          echo "$code" > ../../doctor.exit.txt
+          exit "$code"
 
       - name: Verify manifests
         working-directory: dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2
@@ -114,7 +119,11 @@ jobs:
           cat diagnostics/generation.exit.txt 2>/dev/null || true
           echo '=== GENERATION LOG ==='
           tail -n 120 diagnostics/generation.log 2>/dev/null || true
+          echo '=== DOCTOR EXIT ==='
+          cat diagnostics/doctor.exit.txt 2>/dev/null || true
+          echo '=== DOCTOR LOG ==='
+          tail -n 160 diagnostics/doctor.log 2>/dev/null || true
           echo '=== TEST EXIT ==='
           cat diagnostics/tests.exit.txt 2>/dev/null || true
           echo '=== TEST LOG ==='
-          tail -n 160 diagnostics/tests.log 2>/dev/null || true
+          tail -n 200 diagnostics/tests.log 2>/dev/null || true
