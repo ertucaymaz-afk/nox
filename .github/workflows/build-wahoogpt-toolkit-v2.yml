@@ -105,6 +105,12 @@ jobs:
 
       - name: Print compact diagnostics
         run: |
+          echo '=== SYNTAX LOGS ==='
+          for file in diagnostics/syntax-*.log; do
+            test -f "$file" || continue
+            echo "--- $file"
+            cat "$file"
+          done
           echo '=== GENERATION EXIT ==='
           cat diagnostics/generation.exit.txt 2>/dev/null || true
           echo '=== GENERATION LOG ==='
