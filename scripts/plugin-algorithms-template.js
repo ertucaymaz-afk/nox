@@ -39,6 +39,10 @@ const replacement = `  async function deadCodeDetector(input = {}) {
 `;
 source = source.slice(0, start) + replacement + source.slice(end);
 
+// Mojibake motoru taramak istediği replacement karakterini kaynakta literal olarak taşımaz.
+source = source.replace(/source\.includes\("�"\)/g, "source.includes(String.fromCodePoint(0xfffd))");
+source = source.replace(/source\.match\(\/�\/g\)/g, "source.match(new RegExp(String.fromCodePoint(0xfffd), 'g'))");
+
 const compiled = new Module(filename, module);
 compiled.filename = filename;
 compiled.paths = Module._nodeModulePaths(__dirname);
