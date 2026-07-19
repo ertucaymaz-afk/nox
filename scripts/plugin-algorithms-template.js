@@ -1,4 +1,5 @@
 "use strict";
 
-// Güvenli V2 üretici: üretilen kaynaklarda iç içe template interpolation kullanılmaz.
-module.exports = require("./plugin-algorithms-template-fixed");
+// V3: gerçek fonksiyon kaynakları Function#toString ile serialize edilir.
+// Regex, Markdown ve template karakterleri üretici sözdizimini bozamaz.
+module.exports = require("./plugin-algorithms-template-v3");
