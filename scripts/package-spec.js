@@ -1,0 +1,86 @@
+"use strict";
+
+const PACKAGE_NAME = "WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2";
+const VERSION = "2.0.0";
+
+const FEATURES = [
+  "provider-router",
+  "stream-normalizer",
+  "retry-circuit-breaker",
+  "context-budgeter",
+  "tool-policy-engine",
+  "approval-gate",
+  "task-state-machine",
+  "checkpoint-manager",
+  "audit-ledger",
+  "run-replay",
+  "extension-registry",
+  "permission-boundary",
+  "latest-request-guard",
+  "cancellation-controller",
+  "atomic-file-writer",
+  "workspace-path-guard",
+  "secret-redaction",
+  "health-monitor",
+  "feature-flags",
+  "evidence-recorder",
+  "bounded-concurrency-pool",
+  "persistent-run-store",
+  "cache-invalidation",
+  "structured-logger",
+  "local-metrics",
+  "schema-migration-registry",
+  "content-addressed-blob-store",
+  "process-supervisor",
+  "plugin-compatibility-resolver",
+  "rate-limit-governor",
+  "config-resolver",
+  "deterministic-runtime"
+];
+
+const PLUGINS = [
+  ["repository-map", "Repository Map", "repository", "Depo dosya ağacını ignore kurallarıyla güvenli biçimde haritalar.", ["workspace.read"]],
+  ["context-builder", "Context Builder", "repository", "Göreve göre açıklanabilir ve bütçeli bağlam seçer.", ["workspace.read"]],
+  ["code-review", "Code Review", "code", "Kod doğruluk, güvenlik ve bakım risklerini deterministik olarak tarar.", ["workspace.read"]],
+  ["test-generator", "Test Generator", "test", "Sembollerden framework uyumlu test planı üretir.", ["workspace.read"]],
+  ["bug-fix-planner", "Bug Fix Planner", "diagnostic", "Log, stack trace ve diff üzerinden minimal düzeltme planı oluşturur.", []],
+  ["dependency-auditor", "Dependency Auditor", "dependency", "Paket, lockfile, native ABI ve deprecated/fatal ayrımını denetler.", ["workspace.read"]],
+  ["documentation-generator", "Documentation Generator", "docs", "Gerçek proje yapısından kaynak temelli dokümantasyon taslağı üretir.", ["workspace.read"]],
+  ["changelog-builder", "Changelog Builder", "git", "Commit ve diff girdilerinden kategorili sürüm notu üretir.", []],
+  ["commit-message-assistant", "Commit Message Assistant", "git", "Diff'ten conventional commit önerisi çıkarır.", []],
+  ["prompt-library", "Prompt Library", "productivity", "Yerel prompt CRUD, sürüm, etiket, içe/dışa aktarma ve redaction sağlar.", ["workspace.read", "workspace.write"]],
+  ["file-summarizer", "File Summarizer", "repository", "Dosya sembol, import, public API, TODO ve karmaşıklık özetini çıkarır.", ["workspace.read"]],
+  ["local-search", "Local Search", "repository", "Workspace içinde sınırlandırılmış text/regex araması yapar.", ["workspace.read"]],
+  ["diff-explainer", "Diff Explainer", "git", "Diff'in davranış, güvenlik, migration, test ve rollback etkisini açıklar.", []],
+  ["log-analyzer", "Log Analyzer", "diagnostic", "Logları kontrollü normalize ederek hata kümeleri üretir.", []],
+  ["api-contract-review", "API Contract Review", "contract", "JSON Schema, OpenAPI ve IPC kontratlarını denetler.", []],
+  ["secret-scanner", "Secret Scanner", "security", "API anahtarı, token, private key ve connection string sinyallerini maskeli tarar.", ["workspace.read"]],
+  ["license-scanner", "License Scanner", "dependency", "Bağımlılık lisanslarını risk kategorilerine ayırır.", ["workspace.read"]],
+  ["performance-hints", "Performance Hints", "code", "Senkron I/O, listener, interval, N+1 ve büyük IPC risklerini bulur.", ["workspace.read"]],
+  ["refactor-planner", "Refactor Planner", "code", "Küçük ve geri alınabilir refactor aşamaları üretir.", []],
+  ["workspace-doctor", "Workspace Doctor", "diagnostic", "Node, Git, Electron, CSP, provider ve Windows build koşullarını gerçek veriden denetler.", ["workspace.read"]],
+  ["architecture-graph", "Architecture Graph", "architecture", "JS/TS/Python/C#/Java bağımlılık grafiği, cycle ve fan-in/out üretir.", ["workspace.read"]],
+  ["dead-code-detector", "Dead Code Detector", "code", "Entrypoint ve import erişilebilirliğine göre kullanılmayan kod adayları çıkarır.", ["workspace.read"]],
+  ["duplicate-code-finder", "Duplicate Code Finder", "code", "Normalize token shingles ile exact ve near duplicate blokları bulur.", ["workspace.read"]],
+  ["migration-planner", "Migration Planner", "database", "JSON/SQLite/SQL şema farkından sıralı migration, preflight ve rollback planı üretir.", []],
+  ["ipc-contract-auditor", "IPC Contract Auditor", "electron", "ipcMain, preload ve renderer kanal eşleşmelerini ve sender doğrulamasını denetler.", ["workspace.read"]],
+  ["electron-security-auditor", "Electron Security Auditor", "electron", "Electron güvenlik ayarları, CSP, navigation ve permission policy açıklarını tarar.", ["workspace.read"]],
+  ["build-log-diagnoser", "Build Log Diagnoser", "diagnostic", "npm, electron-builder, NSIS ve PowerShell loglarında warning/fatal ayrımı yapar.", []],
+  ["encoding-mojibake-doctor", "Encoding Mojibake Doctor", "diagnostic", "UTF-8, Windows-1254 ve Latin1 mojibake sinyallerini bulur ve dry-run çözüm önerir.", ["workspace.read"]],
+  ["config-drift-detector", "Config Drift Detector", "contract", "Defaults, schema, env ve docs anahtarları arasındaki drift'i bulur.", ["workspace.read"]],
+  ["environment-key-doctor", "Environment Key Doctor", "provider", "Resmî provider env adları ve typo alias'ları değer göstermeden denetler.", []],
+  ["git-risk-analyzer", "Git Risk Analyzer", "git", "Dirty, untracked, büyük diff, secret, lockfile ve migration risklerini değerlendirir.", ["workspace.read"]],
+  ["release-readiness", "Release Readiness", "release", "Doctor, test, docs, version, changelog, license, secret ve build kapılarını birleştirir.", ["workspace.read"]],
+  ["test-gap-analyzer", "Test Gap Analyzer", "test", "Source export/branch ile test import/name ve opsiyonel coverage farklarını analiz eder.", ["workspace.read"]],
+  ["flaky-test-analyzer", "Flaky Test Analyzer", "test", "Tekrarlı test sonuçlarında zamanlama, shared state, port ve rastgelelik sinyallerini bulur.", []],
+  ["error-handling-auditor", "Error Handling Auditor", "code", "Swallowed error, generic catch, lost cause, rejection ve cleanup eksiklerini tarar.", ["workspace.read"]],
+  ["accessibility-ui-auditor", "Accessibility UI Auditor", "ui", "HTML/JSX label, alt, heading, keyboard, focus ve ARIA hatalarını statik analiz eder.", ["workspace.read"]],
+  ["localization-integrity", "Localization Integrity", "i18n", "Çeviri anahtarları, placeholder, mojibake, duplicate ve çevrilmemiş literal adaylarını karşılaştırır.", ["workspace.read"]],
+  ["workspace-indexer", "Workspace Indexer", "repository", "Incremental hash, sembol ve import manifesti ile stale generation guard üretir.", ["workspace.read", "workspace.write"]],
+  ["dependency-upgrade-planner", "Dependency Upgrade Planner", "dependency", "Semver, peer dependency ve Electron ABI riskleriyle sıralı upgrade planı üretir.", []],
+  ["patch-safety-validator", "Patch Safety Validator", "security", "Unified diff sınır, binary, base hash, forbidden path, secret ve test etkisini doğrular.", []]
+].map(([id, name, category, description, permissions]) => ({ id, name, category, description, permissions }));
+
+const PROVIDERS = ["openai", "gemini", "anthropic", "deepseek", "kimi", "local-openai-compatible"];
+
+module.exports = { PACKAGE_NAME, VERSION, FEATURES, PLUGINS, PROVIDERS };
