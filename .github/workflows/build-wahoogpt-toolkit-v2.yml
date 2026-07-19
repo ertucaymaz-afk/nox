@@ -1,0 +1,60 @@
+name: Build WahooGPT Toolkit V2
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Generate source package
+        run: node scripts/generate-package.js
+
+      - name: Run package doctor
+        working-directory: dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2
+        run: node scripts/doctor.js
+
+      - name: Verify manifests
+        working-directory: dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2
+        run: node scripts/verify-manifests.js
+
+      - name: Verify permissions
+        working-directory: dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2
+        run: node scripts/verify-permissions.js
+
+      - name: Run all tests
+        working-directory: dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2
+        run: node scripts/run-tests.js
+
+      - name: Create ZIP and SHA-256
+        working-directory: dist
+        run: |
+          zip -r -9 WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2.zip WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2
+          sha256sum WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2.zip > WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2_SHA256.txt
+          unzip -t WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2.zip
+
+      - name: Upload verified artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2
+          path: |
+            dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2.zip
+            dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2_SHA256.txt
+            dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2/VALIDATION_REPORT.json
+          if-no-files-found: error
+          retention-days: 30
