@@ -50,8 +50,8 @@ const plugin = require("../index");
 test("repository-map gerçek davranış", async () => {
   const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "repository-map-"));
   fs.mkdirSync(path.join(fixture, "src"), { recursive: true });
-  fs.writeFileSync(path.join(fixture, "src", "alpha.js"), "module.exports = { alpha: true };\n", "utf8");
-  fs.writeFileSync(path.join(fixture, "README.md"), "# Demo\n", "utf8");
+  fs.writeFileSync(path.join(fixture, "src", "alpha.js"), "module.exports = { alpha: true };", "utf8");
+  fs.writeFileSync(path.join(fixture, "README.md"), "# Demo", "utf8");
   const result = await plugin.run({ root: fixture }, {});
   assert.equal(result.ok, true, JSON.stringify(result));
   assert.ok(result.data.fileCount >= 2, JSON.stringify(result.data));
@@ -76,7 +76,7 @@ const plugin = require("../index");
 test("duplicate-code-finder gerçek davranış", async () => {
   const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "duplicate-code-"));
   fs.mkdirSync(path.join(fixture, "src"), { recursive: true });
-  const repeated = "const shared = 1; function calculate(){ return shared + 1; }\n";
+  const repeated = "const shared = 1; function calculate(){ return shared + 1; }";
   fs.writeFileSync(path.join(fixture, "src", "alpha.js"), repeated, "utf8");
   fs.writeFileSync(path.join(fixture, "src", "beta.js"), repeated, "utf8");
   const result = await plugin.run({ root: fixture, minLines: 1, threshold: 0.6 }, {});
