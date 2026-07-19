@@ -22,8 +22,21 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Syntax check generators
+        run: |
+          node --check scripts/package-spec.js 2>&1 | tee syntax-package-spec.log
+          node --check scripts/runtime-templates.js 2>&1 | tee syntax-runtime.log
+          node --check scripts/plugin-algorithms-template.js 2>&1 | tee syntax-algorithms.log
+          node --check scripts/generate-package.js 2>&1 | tee syntax-generator.log
+
       - name: Generate source package
-        run: node scripts/generate-package.js
+        run: |
+          set +e
+          node scripts/generate-package.js > generation.log 2>&1
+          code=$?
+          cat generation.log
+          echo "$code" > generation.exit.txt
+          exit "$code"
 
       - name: Run package doctor
         working-directory: dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2
@@ -39,7 +52,13 @@ jobs:
 
       - name: Run all tests
         working-directory: dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2
-        run: node scripts/run-tests.js
+        run: |
+          set +e
+          node scripts/run-tests.js > ../../tests.log 2>&1
+          code=$?
+          cat ../../tests.log
+          echo "$code" > ../../tests.exit.txt
+          exit "$code"
 
       - name: Create ZIP and SHA-256
         working-directory: dist
@@ -47,6 +66,18 @@ jobs:
           zip -r -9 WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2.zip WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2
           sha256sum WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2.zip > WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2_SHA256.txt
           unzip -t WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2.zip
+
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: WahooGPT_Toolkit_V2_Diagnostics
+          path: |
+            *.log
+            *.txt
+            dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2/VALIDATION_REPORT.json
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Upload verified artifact
         uses: actions/upload-artifact@v4
