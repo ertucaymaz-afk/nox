@@ -31,9 +31,15 @@ const promptSpec = '  "prompt-library":{input:{action:"list"},assert:"assert.equ
 if (!source.includes(promptAnchor)) throw new Error("Prompt Library test ekleme noktası bulunamadı");
 source = source.replace(promptAnchor, promptSpec + promptAnchor);
 
-// Duplicate fixture çok satırlı stringi üretilen testte sözdizimini bozmayacak biçimde oluşturur.
+// Repository Map fixture iki gerçek dosya içerir.
+const repositoryPattern = /  "repository-map":\{[^\n]+\},/;
+const repositorySpec = '  "repository-map":{fixture:true,inputExpr:"{root:fixture}",extra:"fs.writeFileSync(path.join(fixture,\'README.md\'),\'demo repository\');",assert:"assert.equal(result.ok,true); assert.ok(result.data.fileCount>=2); assert.ok(result.data.byLanguage.JavaScript>=1);"},';
+if (!repositoryPattern.test(source)) throw new Error("Repository Map test düzeltme noktası bulunamadı");
+source = source.replace(repositoryPattern, repositorySpec);
+
+// Duplicate fixture yalnız tek satırlı, güvenli JavaScript kullanır; string kaçışına bağlı değildir.
 const duplicatePattern = /  "duplicate-code-finder":\{[^\n]+\},/;
-const duplicateSpec = String.raw`  "duplicate-code-finder":{fixture:true,inputExpr:"{root:fixture,minLines:3,threshold:0.5}",extra:"fs.writeFileSync(path.join(fixture,'src','beta.js'),['function a(){',' const value=1;',' return value;','}'].join('\\n')); fs.writeFileSync(path.join(fixture,'src','gamma.js'),['function b(){',' const value=1;',' return value;','}'].join('\\n'));",assert:"assert.equal(result.ok,true); assert.ok(result.data.matches.length>=1);"},`;
+const duplicateSpec = '  "duplicate-code-finder":{fixture:true,inputExpr:"{root:fixture,minLines:1,threshold:0.6}",extra:"fs.writeFileSync(path.join(fixture,\'src\',\'beta.js\'),\'const shared=1; function calculate(){ return shared + 1; }\'); fs.writeFileSync(path.join(fixture,\'src\',\'gamma.js\'),\'const shared=1; function calculate(){ return shared + 1; }\');",assert:"assert.equal(result.ok,true); assert.ok(result.data.matches.length>=1);"},';
 if (!duplicatePattern.test(source)) throw new Error("Duplicate Code Finder test düzeltme noktası bulunamadı");
 source = source.replace(duplicatePattern, duplicateSpec);
 
