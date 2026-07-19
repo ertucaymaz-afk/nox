@@ -82,6 +82,8 @@ jobs:
             *.log
             *.txt
             dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2/VALIDATION_REPORT.json
+            dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2/src/plugins/duplicate-code-finder/tests/plugin.test.js
+            dist/WahooGPT_Harici_40_Eklenti_32_Ozellik_Ucretsiz_v2/src/plugins/repository-map/tests/plugin.test.js
           if-no-files-found: warn
           retention-days: 7
 
@@ -107,25 +109,21 @@ jobs:
           name: WahooGPT_Toolkit_V2_Diagnostics
           path: diagnostics
 
-      - name: Print compact diagnostics
+      - name: Print focused test diagnostics
         run: |
-          echo '=== SYNTAX LOGS ==='
-          for file in diagnostics/syntax-*.log; do
-            test -f "$file" || continue
-            echo "--- $file"
-            cat "$file"
-          done
-          echo '=== GENERATION EXIT ==='
-          cat diagnostics/generation.exit.txt 2>/dev/null || true
-          echo '=== GENERATION LOG ==='
-          tail -n 120 diagnostics/generation.log 2>/dev/null || true
-          echo '=== DOCTOR EXIT ==='
-          cat diagnostics/doctor.exit.txt 2>/dev/null || true
-          echo '=== DOCTOR LOG ==='
-          tail -n 160 diagnostics/doctor.log 2>/dev/null || true
           echo '=== TEST EXIT ==='
           cat diagnostics/tests.exit.txt 2>/dev/null || true
-          echo '=== TEST FAILURE INDEX ==='
-          grep -n -E 'not ok|AssertionError|ERR_ASSERTION|failureType:|error:|tests [0-9]+|pass [0-9]+|fail [0-9]+' diagnostics/tests.log 2>/dev/null | tail -n 240 || true
-          echo '=== TEST LOG TAIL ==='
-          tail -n 240 diagnostics/tests.log 2>/dev/null || true
+          echo '=== FAILURE NAMES ==='
+          grep -n '^not ok' diagnostics/tests.log 2>/dev/null || true
+          echo '=== FAILURE BLOCKS ==='
+          awk '
+            /^not ok/ { show=1; left=24 }
+            show { print; left-- }
+            show && left<=0 { show=0 }
+          ' diagnostics/tests.log 2>/dev/null || true
+          echo '=== DUPLICATE GENERATED TEST ==='
+          find diagnostics -path '*duplicate-code-finder/tests/plugin.test.js' -type f -exec sed -n '1,120p' {} \; 2>/dev/null || true
+          echo '=== REPOSITORY GENERATED TEST ==='
+          find diagnostics -path '*repository-map/tests/plugin.test.js' -type f -exec sed -n '1,120p' {} \; 2>/dev/null || true
+          echo '=== TEST SUMMARY ==='
+          grep -E '^# (tests|suites|pass|fail|cancelled|skipped|todo|duration_ms)' diagnostics/tests.log 2>/dev/null || true
