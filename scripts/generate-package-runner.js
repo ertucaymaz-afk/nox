@@ -2,7 +2,7 @@
 "use strict";
 
 // Ana üreticiyi değiştirmeden kontrollü kaynak düzeltmeleri uygular.
-// Doctor kendi tarama desenini içerdiği için validator/doctor tarafından placeholder sanılmamalıdır.
+// Doctor kendi tarama desenlerini içerdiği için kendisini bozuk dosya sanmamalıdır.
 const fs = require("node:fs");
 const path = require("node:path");
 const Module = require("node:module");
@@ -17,8 +17,13 @@ source = source.replace(validatorNeedle, validatorReplacement);
 
 const doctorNeedle = 'assert.equal(/TODO_PLACEHOLDER|REMOVE_THIS|fake success/i.test(s),false,"placeholder "+f);';
 const doctorReplacement = 'const markerRegex=new RegExp([["TODO","PLACEHOLDER"].join("_"),["REMOVE","THIS"].join("_"),["fake","success"].join(" ")].join("|"),"i");assert.equal(markerRegex.test(s),false,"placeholder "+f);';
-if (!source.includes(doctorNeedle)) throw new Error("Doctor düzeltme noktası bulunamadı");
+if (!source.includes(doctorNeedle)) throw new Error("Doctor placeholder düzeltme noktası bulunamadı");
 source = source.replace(doctorNeedle, doctorReplacement);
+
+const replacementCharNeedle = 'assert.equal(s.includes("�"),false,"replacement char "+f);';
+const replacementCharFix = 'assert.equal(s.includes(String.fromCodePoint(0xfffd)),false,"replacement char "+f);';
+if (!source.includes(replacementCharNeedle)) throw new Error("Doctor replacement-character düzeltme noktası bulunamadı");
+source = source.replace(replacementCharNeedle, replacementCharFix);
 
 const compiled = new Module(filename, module);
 compiled.filename = filename;
