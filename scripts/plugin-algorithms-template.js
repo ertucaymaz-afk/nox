@@ -39,9 +39,9 @@ const replacement = `  async function deadCodeDetector(input = {}) {
 `;
 source = source.slice(0, start) + replacement + source.slice(end);
 
-// Mojibake motoru taramak istediği replacement karakterini kaynakta literal olarak taşımaz.
-source = source.replace(/source\.includes\("�"\)/g, "source.includes(String.fromCodePoint(0xfffd))");
-source = source.replace(/source\.match\(\/�\/g\)/g, "source.match(new RegExp(String.fromCodePoint(0xfffd), 'g'))");
+// U+FFFD karakterini kaynakta literal taşımak yerine ASCII Unicode escape olarak korur.
+// Function#toString bu kaçışı üretilecek kaynakta da muhafaza eder.
+source = source.split(String.fromCodePoint(0xfffd)).join("\\uFFFD");
 
 const compiled = new Module(filename, module);
 compiled.filename = filename;
